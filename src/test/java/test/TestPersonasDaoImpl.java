@@ -7,8 +7,11 @@ import java.util.List;
 //import mx.com.gm.jdbc.PersonaDao;
 import mx.comr.jdbc.IPersonaDao;
 import mx.comr.jdbc.Persona;
+import mx.comr.jdbc.PersonaDaoImp;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +26,7 @@ public class TestPersonasDaoImpl {
 	private IPersonaDao personaDao;
 
 	@Test
+	@Ignore
 	public void deberiaMostrarPersonas() {
 		try {
 			System.out.println();
@@ -43,6 +47,7 @@ public class TestPersonasDaoImpl {
 	}
 
 	@Test
+	@Ignore
 	public void testContarPersonasPorNombre() {
 		try {
 			System.out.println();
@@ -60,6 +65,7 @@ public class TestPersonasDaoImpl {
 	}
 
 	@Test
+	@Ignore
 	public void deberiaEncontrarPersonaPorId() {
 		try {
 			System.out.println();
@@ -76,4 +82,77 @@ public class TestPersonasDaoImpl {
 			logger.error("Error JBDC", e);
 		}
 	}
+
+	@Test
+	@Ignore
+	public void deberiaEncontrarPersonaEmail() {
+		try {
+			System.out.println();
+			logger.info("Inicio del test deberiaEncontrarPersonaEmail");
+			Persona persona = new Persona();
+			String email = "jrodriguez@gmail.com";
+			persona.setEmail(email);
+			persona = personaDao.getPersonaByEmail(persona);
+
+			assertEquals(email, persona.getEmail());
+			// Imprimimos todo el objeto
+			logger.info("Persona recuperada (email=" + email + "): " + persona);
+			logger.info("Fin del test deberiaEncontrarPersonaEmail");
+		} catch (Exception e) {
+			logger.error("Error JBDC", e);
+		}
+	}
+
+	@Test
+	@Ignore
+	public void insertarPersona() {
+		try {
+			System.out.println();
+			logger.info("deberia insertarPersona");
+			Persona p = new Persona();
+			p.setNombre("Luis Pablo");
+			p.setApeMaterno("Periañez");
+			p.setApePaterno("Munguia");
+			p.setEmail("luis.pablo@gmail.com");
+
+			int count = personaDao.contadorPersonas();
+			
+			personaDao.insertPersona(p);
+			int countActual = personaDao.contadorPersonas();
+			assertEquals((count + 1), countActual);
+			logger.info("Personas insertadas " + countActual);
+			
+			logger.info("Actualizar datos");
+			p = personaDao.getPersonaByEmail(p);
+			logger.info("Actualizar persona:" + p);
+			
+			p.setNombre("Pablo");
+			personaDao.updatePersona(p);
+			
+			Persona pActual = personaDao.getPersonaByEmail(p);
+			logger.info("persona actualizada:" + pActual);
+			assertEquals(p.getNombre(),pActual.getNombre());
+			logger.info("Usuario actualizado");
+			
+		} catch (Exception e) {
+			logger.error("Error JBDC", e);
+		}
+	}
+	
+	@Test
+	public void eliminarPersona(){
+		try{
+			Persona p = personaDao.findPersonaById(1);			
+			logger.info("Eliminar persona:" + p);			
+			personaDao.deletePersona(p);
+			logger.info("Personas restantes:");
+			List<Persona> personas = personaDao.findAllPersonas();
+			for (Persona persona : personas) {
+				logger.info(persona);
+			}
+		}catch(Exception e){
+			logger.info("Eliminar a una persona error:" + e.getMessage());
+		}
+	}
+
 }
